@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import './providers/auth_provider.dart';
 import './pages/home_page.dart';
 import './pages/login_page.dart';
 
@@ -8,14 +10,30 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
-    return MaterialApp(
-      title: 'Flutter Demo',
-      home: const LoginPage()
+    return ChangeNotifierProvider(
+      create: (context) => AuthProvider(),
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        home: const MyAppBody(),
+        routes: {
+          HomePage.routeName: (context) => const HomePage()
+        },
+      )
     );
+  }
+}
+
+class MyAppBody extends StatelessWidget {
+  const MyAppBody({ Key? key }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final AuthProvider ordersProvider = Provider.of<AuthProvider>(context);
+
+    return ordersProvider.isLoggedIn
+      ? const HomePage()
+      : const LoginPage();
   }
 }
