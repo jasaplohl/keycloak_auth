@@ -3,21 +3,60 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../env.dart';
 
 class AuthProvider with ChangeNotifier {
   final FlutterAppAuth appAuth = FlutterAppAuth();
-
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   final AuthorizationServiceConfiguration config = const AuthorizationServiceConfiguration(
     authorizationEndpoint: Environment.authorizationEndpoint,
     tokenEndpoint: Environment.tokenEndpoint,
     endSessionEndpoint: Environment.endSessionEndpoint
   );
 
+  String? accessToken;
   String? idToken;
   bool isLoggedIn = false;
-  String? name;
+
+  AuthProvider() {
+    initAuth();
+  }
+
+  Future<void> initAuth() async {
+    final String? storedRefreshToken = await secureStorage.read(key: "refresh_token");
+
+    if(storedRefreshToken == null) return;
+    
+    isLoggedIn = true;
+    getAccessToken(storedRefreshToken);
+
+    notifyListeners();
+  }
+
+  void getAccessToken(String refreshToken) async {
+    await appAuth.token(TokenRequest(
+      Environment.clientId, 
+      Environment.redirectUri,
+      issuer: Environment.issuer,
+      allowInsecureConnections: Environment.allowInsecureConnections,
+      serviceConfiguration: config,
+      refreshToken: refreshToken
+    ))
+    .then((value) async {
+      idToken = value!.idToken;
+      accessToken = value.accessToken;
+      
+      await secureStorage.write(
+        key: "refresh_token", 
+        value: value.refreshToken
+      );
+    })
+    .catchError((error) {
+      print(error);
+    });
+  }
 
   void login() async {
     final AuthorizationTokenRequest request = AuthorizationTokenRequest(
@@ -31,9 +70,14 @@ class AuthProvider with ChangeNotifier {
     );
 
     appAuth.authorizeAndExchangeCode(request)
-    .then((value) {
+    .then((value) async {
       isLoggedIn = true;
       idToken = value!.idToken;
+      accessToken = value.accessToken;
+      await secureStorage.write(
+        key: "refresh_token", 
+        value: value.refreshToken
+      );
     })
     .catchError((error) {
       debugPrint(error);
@@ -53,19 +97,14 @@ class AuthProvider with ChangeNotifier {
       allowInsecureConnections: Environment.allowInsecureConnections,
       serviceConfiguration: config
     ))
-    .then((_) {
+    .then((_) async {
       isLoggedIn = false;
+      await secureStorage.delete(key: 'refresh_token');
       notifyListeners();
     })
     .catchError((error) {
       debugPrint(error);
     });
-  }
-
-  Map<String, String> parseIdToken(String idToken) {
-    final List<String> parts = idToken.split('.');
-    final Map<String, String> parsed = jsonDecode(utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))));
-    return parsed;
   }
 
   void getUserDetails(String accessToken) async {

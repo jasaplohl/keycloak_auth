@@ -25,13 +25,12 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyAppBody extends StatelessWidget {
-  const MyAppBody({ Key? key }) : super(key: key);
+class MyAppBody extends StatelessWidget{
+  const MyAppBody({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final AuthProvider ordersProvider = Provider.of<AuthProvider>(context);
-
     return ordersProvider.isLoggedIn
       ? const HomePage()
       : const LoginPage();
