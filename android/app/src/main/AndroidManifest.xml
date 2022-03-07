@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.my_app.keycloak_auth">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -15,6 +17,7 @@
     </queries>
 
    <application
+        android:usesCleartextTraffic="true"
         android:label="keycloak_auth"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
