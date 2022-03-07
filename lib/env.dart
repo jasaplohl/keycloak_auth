@@ -1,7 +1,13 @@
 class Environment {
-  static const auth0Domain = 'http://localhost:8080/realms/flutter-app/protocol/openid-connect/auth';
-  static const auth0ClientId = 'flutter-client';
+  static const clientId = 'flutter-client';
+  static const discoveryUrl = "http://10.0.2.2:8080/realms/flutter-app/.well-known/openid-configuration";
 
-  static const auth0RedirectUri = 'com.my_app.keycloak_auth://login-callback';
-  static const auth0Issuer = 'http://localhost:8080/realms/flutter-app';
+  static const redirectUri = 'com.authapp://login-callback/';
+  static const issuer = 'https://10.0.2.2:8080/realms/flutter-app';
+
+  static const authorizationEndpoint = "http://10.0.2.2:8080/realms/flutter-app/protocol/openid-connect/auth";
+  static const tokenEndpoint = "http://10.0.2.2:8080/realms/flutter-app/protocol/openid-connect/token";
+  static const endSessionEndpoint = "http://10.0.2.2:8080/realms/flutter-app/protocol/openid-connect/logout";
+
+  static const List<String> scopes = ["openid"];
 }
