@@ -32,19 +32,16 @@ class AuthProvider with ChangeNotifier {
 
     appAuth.authorizeAndExchangeCode(request)
     .then((value) {
-      if(value != null) {
-        isLoggedIn = true;
-        idToken = value.idToken;
-        parseIdTokenDecode(idToken!);
-        notifyListeners();
-      }
+      isLoggedIn = true;
+      idToken = value!.idToken;
     })
     .catchError((error) {
-      print("Error:");
-      print(error);
+      debugPrint(error);
       isLoggedIn = false;
       idToken = null;
-      notifyListeners();
+    })
+    .then((_) => {
+      notifyListeners()
     });
   }
 
@@ -56,42 +53,43 @@ class AuthProvider with ChangeNotifier {
       allowInsecureConnections: Environment.allowInsecureConnections,
       serviceConfiguration: config
     ))
-    .then((value) {
+    .then((_) {
       isLoggedIn = false;
       notifyListeners();
     })
     .catchError((error) {
-      print("Log out failed!");
-      print(error);
+      debugPrint(error);
     });
   }
 
-  void parseIdTokenDecode(String idToken) {
+  Map<String, String> parseIdToken(String idToken) {
     final List<String> parts = idToken.split('.');
-    final Map parsed = jsonDecode(utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))));
-    parsed.keys.forEach((element) {
-      print("$element => ${parsed[element]}");
-    });
+    final Map<String, String> parsed = jsonDecode(utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))));
+    return parsed;
   }
 
-  Map<String, Object> parseIdToken(String idToken) {
-    final List<String> parts = idToken.split('.');
-    assert(parts.length == 3);
-
-    return jsonDecode(utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))));
-  }
-
-  Future<Map<String, Object>> getUserDetails(String accessToken) async {
-    Uri url = Uri(path: Environment.userInfoEndpoint);
-    final http.Response response = await http.get(
+  void getUserDetails(String accessToken) async {
+    Uri url = Uri.parse(Environment.userInfoEndpoint);
+    http.get(
       url,
-      headers: <String, String>{'Authorization': 'Bearer $accessToken'},
-    );
+      headers: {
+        'Authorization': 'Bearer $accessToken'
+      },
+    )
+    .then((response) {
+      parseUserdetails(response);
+    })
+    .catchError((erorr) {
+      print(erorr);
+    });
+  }
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+  void parseUserdetails(http.Response response) {
+    Map<String, dynamic> details = jsonDecode(response.body);
+    if(response.statusCode == 200) {
+
     } else {
-      throw Exception('Failed to get user details');
+      print("Failed to get user details!");
     }
   }
   
