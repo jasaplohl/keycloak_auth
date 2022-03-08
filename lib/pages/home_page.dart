@@ -80,20 +80,23 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Home")),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(_getExpirationString(authProvider.expirationDate!)),
-          if(email != null) Text("Email: $email"),
-          if(name != null) Text("Name: $name"),
-          if(username != null) Text("Username: $username"),
-          if(emailVerified != null) Text(emailVerified! ? "Email is verified." : "Email is not verified!"),
-          TextButton(
-            onPressed:  authProvider.logout, 
-            child: const Text("Log out")
-          )
-        ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 25),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(_getExpirationString(authProvider.expirationDate!)),
+            if(email != null) Text("Email: $email"),
+            if(name != null) Text("Name: $name"),
+            if(username != null) Text("Username: $username"),
+            if(emailVerified != null) Text(emailVerified! ? "Email is verified." : "Email is not verified!"),
+            TextButton(
+              onPressed: authProvider.logout, 
+              child: const Text("Log out")
+            )
+          ],
+        )
       )
     );
   }
