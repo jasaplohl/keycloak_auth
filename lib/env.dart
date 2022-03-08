@@ -1,5 +1,6 @@
 class Environment {
   static const clientId = 'flutter-client';
+  static const clientSecret = "GpDYXJKabQz31xHHEzaBaoeCOmIACR5e";
   static const discoveryUrl = "http://10.0.2.2:8080/realms/flutter-app/.well-known/openid-configuration";
 
   static const redirectUri = 'com.authapp://login-callback/';

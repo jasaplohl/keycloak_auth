@@ -29,7 +29,6 @@ class AuthProvider with ChangeNotifier {
 
     if(storedRefreshToken == null) return;
     
-    isLoggedIn = true;
     getAccessToken(storedRefreshToken);
 
     notifyListeners();
@@ -42,19 +41,18 @@ class AuthProvider with ChangeNotifier {
       issuer: Environment.issuer,
       allowInsecureConnections: Environment.allowInsecureConnections,
       serviceConfiguration: config,
+      clientSecret: Environment.clientSecret,
       refreshToken: refreshToken
     ))
     .then((value) async {
+      isLoggedIn = true;
       idToken = value!.idToken;
       accessToken = value.accessToken;
-      
-      await secureStorage.write(
-        key: "refresh_token", 
-        value: value.refreshToken
-      );
+      await secureStorage.write(key: "refresh_token", value: value.refreshToken);
     })
-    .catchError((error) {
+    .catchError((error) async {
       print(error);
+      await secureStorage.delete(key: 'refresh_token');
     });
   }
 
@@ -66,27 +64,26 @@ class AuthProvider with ChangeNotifier {
       scopes: Environment.scopes,
       discoveryUrl: Environment.discoveryUrl,
       serviceConfiguration: config,
-      allowInsecureConnections: Environment.allowInsecureConnections
+      allowInsecureConnections: Environment.allowInsecureConnections,
+      clientSecret: Environment.clientSecret
     );
 
     appAuth.authorizeAndExchangeCode(request)
-    .then((value) async {
-      isLoggedIn = true;
-      idToken = value!.idToken;
-      accessToken = value.accessToken;
-      await secureStorage.write(
-        key: "refresh_token", 
-        value: value.refreshToken
-      );
-    })
-    .catchError((error) {
-      debugPrint(error);
-      isLoggedIn = false;
-      idToken = null;
-    })
-    .then((_) => {
-      notifyListeners()
-    });
+      .then((value) async {
+        isLoggedIn = true;
+        idToken = value!.idToken;
+        accessToken = value.accessToken;
+        await secureStorage.write(key: "refresh_token", value: value.refreshToken);
+      })
+      .catchError((error) async {
+        print(error);
+        isLoggedIn = false;
+        idToken = null;
+        await secureStorage.delete(key: 'refresh_token');;
+      })
+      .then((_) => {
+        notifyListeners()
+      });
   }
 
   void logout() async {
@@ -97,14 +94,14 @@ class AuthProvider with ChangeNotifier {
       allowInsecureConnections: Environment.allowInsecureConnections,
       serviceConfiguration: config
     ))
-    .then((_) async {
-      isLoggedIn = false;
-      await secureStorage.delete(key: 'refresh_token');
-      notifyListeners();
-    })
-    .catchError((error) {
-      debugPrint(error);
-    });
+      .then((_) async {
+        isLoggedIn = false;
+        await secureStorage.delete(key: 'refresh_token');
+        notifyListeners();
+      })
+      .catchError((error) {
+        print(error);
+      });
   }
 
   void getUserDetails(String accessToken) async {
@@ -115,12 +112,12 @@ class AuthProvider with ChangeNotifier {
         'Authorization': 'Bearer $accessToken'
       },
     )
-    .then((response) {
-      parseUserdetails(response);
-    })
-    .catchError((erorr) {
-      print(erorr);
-    });
+      .then((response) {
+        parseUserdetails(response);
+      })
+      .catchError((erorr) {
+        print(erorr);
+      });
   }
 
   void parseUserdetails(http.Response response) {

@@ -22,9 +22,13 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(title: const Text("Home")),
       body: Column(
         children: <Widget>[
-          TextButton(
-            onPressed:  ordersProvider.logout, 
-            child: const Text("Log out")
+          Expanded(
+            child: Center(
+              child: TextButton(
+                onPressed:  ordersProvider.logout, 
+                child: const Text("Log out")
+              )
+            ),
           )
         ],
       )

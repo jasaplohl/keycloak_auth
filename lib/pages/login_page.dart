@@ -23,9 +23,13 @@ class _LoginPageState extends State<LoginPage> {
         ? const CircularProgressIndicator()
         : Column(
             children: <Widget>[
-              TextButton(
-                onPressed: () => loginAction(ordersProvider), 
-                child: const Text("Login with Keycloak")
+              Expanded(
+                child: Center(
+                  child: TextButton(
+                    onPressed: () => loginAction(ordersProvider), 
+                    child: const Text("Login with Keycloak")
+                  )
+                )
               )
             ],
           )
