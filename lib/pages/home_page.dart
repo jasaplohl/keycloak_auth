@@ -92,6 +92,10 @@ class _HomePageState extends State<HomePage> {
             if(username != null) Text("Username: $username"),
             if(emailVerified != null) Text(emailVerified! ? "Email is verified." : "Email is not verified!"),
             TextButton(
+              onPressed: authProvider.introspectToken, 
+              child: const Text("Validate token")
+            ),
+            TextButton(
               onPressed: authProvider.logout, 
               child: const Text("Log out")
             )

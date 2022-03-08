@@ -108,6 +108,24 @@ class AuthProvider with ChangeNotifier {
       });
   }
 
+  void introspectToken() async {
+    Uri url = Uri.parse(Environment.introspectEndpoint);
+    http.post(
+      url,
+      body: {
+        "token": accessToken,
+        "client_id": Environment.clientId,
+        "client_secret": Environment.clientSecret
+      }
+    )
+      .then((response) {
+        print(response.body);
+      })
+      .catchError((error) {
+        print(error);
+      });
+  }
+
   Future<Map<String, dynamic>> getUserDetails() async {
     Uri url = Uri.parse(Environment.userInfoEndpoint);
     Map<String, dynamic> details = {};

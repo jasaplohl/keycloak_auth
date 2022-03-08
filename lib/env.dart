@@ -11,6 +11,8 @@ class Environment {
   static const endSessionEndpoint = "http://10.0.2.2:8080/realms/flutter-app/protocol/openid-connect/logout";
   static const userInfoEndpoint = "http://10.0.2.2:8080/realms/flutter-app/protocol/openid-connect/userinfo";
 
+  static const introspectEndpoint = "http://10.0.2.2:8080/realms/flutter-app/protocol/openid-connect/token/introspect";
+
   static const List<String> scopes = ["openid", "offline_access", "profile"];
 
   static const bool allowInsecureConnections = true;
