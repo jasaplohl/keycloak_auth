@@ -108,29 +108,25 @@ class AuthProvider with ChangeNotifier {
       });
   }
 
-  void getUserDetails(String accessToken) async {
+  Future<Map<String, dynamic>> getUserDetails() async {
     Uri url = Uri.parse(Environment.userInfoEndpoint);
-    http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $accessToken'
-      },
-    )
-      .then((response) {
-        parseUserdetails(response);
-      })
-      .catchError((erorr) {
-        print(erorr);
-      });
-  }
-
-  void parseUserdetails(http.Response response) {
-    Map<String, dynamic> details = jsonDecode(response.body);
-    if(response.statusCode == 200) {
-
-    } else {
-      print("Failed to get user details!");
+    Map<String, dynamic> details = {};
+    try {
+      http.Response response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken'
+        },
+      );
+      if(response.statusCode == 200) {
+        details = jsonDecode(response.body);
+      } else {
+        throw Exception("Failed to get user details!");
+      }
+    } catch(error) {
+      print(error);
     }
+    return details;
   }
   
 }
