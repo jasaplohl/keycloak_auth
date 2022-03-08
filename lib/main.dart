@@ -30,8 +30,8 @@ class MyAppBody extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    final AuthProvider ordersProvider = Provider.of<AuthProvider>(context);
-    return ordersProvider.isLoggedIn
+    final AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    return authProvider.isLoggedIn
       ? const HomePage()
       : const LoginPage();
   }

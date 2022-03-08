@@ -16,6 +16,7 @@ class AuthProvider with ChangeNotifier {
     endSessionEndpoint: Environment.endSessionEndpoint
   );
 
+  DateTime? expirationDate;
   String? accessToken;
   String? idToken;
   bool isLoggedIn = false;
@@ -30,8 +31,6 @@ class AuthProvider with ChangeNotifier {
     if(storedRefreshToken == null) return;
     
     getAccessToken(storedRefreshToken);
-
-    notifyListeners();
   }
 
   void getAccessToken(String refreshToken) async {
@@ -48,11 +47,15 @@ class AuthProvider with ChangeNotifier {
       isLoggedIn = true;
       idToken = value!.idToken;
       accessToken = value.accessToken;
+      expirationDate = value.accessTokenExpirationDateTime;
       await secureStorage.write(key: "refresh_token", value: value.refreshToken);
     })
     .catchError((error) async {
       print(error);
       await secureStorage.delete(key: 'refresh_token');
+    })
+    .then((value) => {
+      notifyListeners()
     });
   }
 
@@ -73,6 +76,7 @@ class AuthProvider with ChangeNotifier {
         isLoggedIn = true;
         idToken = value!.idToken;
         accessToken = value.accessToken;
+        expirationDate = value.accessTokenExpirationDateTime;
         await secureStorage.write(key: "refresh_token", value: value.refreshToken);
       })
       .catchError((error) async {

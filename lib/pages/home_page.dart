@@ -15,17 +15,23 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+  int getDurationInSeconds(DateTime expirationDate) {
+    int seconds = expirationDate.difference(DateTime.now()).inSeconds;
+    return seconds;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final AuthProvider ordersProvider = Provider.of<AuthProvider>(context, listen: false);
+    final AuthProvider authProvider = Provider.of<AuthProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(title: const Text("Home")),
       body: Column(
-        children: <Widget>[
+        children: [
+          Text(getDurationInSeconds(authProvider.expirationDate!).toString()),
           Expanded(
             child: Center(
               child: TextButton(
-                onPressed:  ordersProvider.logout, 
+                onPressed:  authProvider.logout, 
                 child: const Text("Log out")
               )
             ),

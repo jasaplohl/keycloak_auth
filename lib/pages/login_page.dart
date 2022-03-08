@@ -15,7 +15,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final AuthProvider ordersProvider = Provider.of<AuthProvider>(context, listen: false);
+    final AuthProvider authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(title: const Text("Authentication")),
@@ -26,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
               Expanded(
                 child: Center(
                   child: TextButton(
-                    onPressed: () => loginAction(ordersProvider), 
+                    onPressed: () => loginAction(authProvider), 
                     child: const Text("Login with Keycloak")
                   )
                 )
@@ -36,11 +36,11 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void loginAction(AuthProvider ordersProvider) {
+  void loginAction(AuthProvider authProvider) {
     setState(() {
       isLoading = true;
     });
-    ordersProvider.login();
+    authProvider.login();
     setState(() {
       isLoading = false;
     });
