@@ -83,7 +83,7 @@ class AuthProvider with ChangeNotifier {
         print(error);
         isLoggedIn = false;
         idToken = null;
-        await secureStorage.delete(key: 'refresh_token');;
+        await secureStorage.delete(key: 'refresh_token');
       })
       .then((_) => {
         notifyListeners()
